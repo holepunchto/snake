@@ -1,0 +1,25 @@
+{
+  "name": "snake",
+  "main": "index.html",
+  "pear": {
+    "name": "snake",
+    "type": "desktop",
+    "gui": {
+      "backgroundColor": "#1F2430",
+      "height": "760",
+      "width": "900"
+    }
+  },
+  "type": "module",
+  "license": "Apache-2.0",
+  "author": "Holepunch Inc.",
+  "scripts": {
+    "dev": "pear run -d .",
+    "test": "brittle test/*.test.js"
+  },
+  "dependencies": {
+    "b4a": "^1.6.7",
+    "hypercore-crypto": "^3.4.2",
+    "hyperswarm": "^4.8.4"
+  }
+}
