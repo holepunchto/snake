@@ -6,6 +6,7 @@ const swarm = new Hyperswarm()
 
 function send(msg) {
   Bare.IPC.write(Buffer.from(JSON.stringify(msg)))
+  Bare.IPC.write(Buffer.from('\n'))
 }
 
 Bare.IPC.on('data', (data) => {
