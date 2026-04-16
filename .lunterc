@@ -1,0 +1,5 @@
+{
+  "env": ["node", "browser"],
+  "ignore": ["out"],
+  "globals": ["customElements"]
+}
