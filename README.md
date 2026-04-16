@@ -133,7 +133,7 @@ pear touch
 Set upgrade field to new link, stage that onto prior stage link.
 
 ```sh
-PRIOR_UPGADE = npm get upgrade
+PRIOR_UPGADE=npm get upgrade
 npm set upgrade=<newly-touched-link>
 npm run bootstrap $PRIOR_UPGRADE
 ```
