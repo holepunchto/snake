@@ -1,7 +1,7 @@
 {
   "name": "snake",
   "productName": "Snake",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "P2P multiplayer snake game",
   "license": "Apache-2.0",
   "author": "Holepunch Inc.",
