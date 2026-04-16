@@ -39,6 +39,5 @@
     "lunte": "^1.6.0",
     "prettier": "^3.8.1",
     "prettier-config-holepunch": "^2.0.0"
-  },
-  "upgrade": "o7hzqsctkp6wq88y8cahb17r3s99nrcx1po3pwszybmomcoghgyy"
+  }
 }
