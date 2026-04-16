@@ -63,7 +63,7 @@ let pearLink = link
 if (!pearLink) {
   console.log('\n--- touch ---')
   const out = await capture('pear touch --json')
-  pearLink = JSON.parse(out.split('\n')[0]).data.key
+  pearLink = 'pear://' + JSON.parse(out.split('\n')[0]).data.key
   if (!pearLink) throw new Error('failed to parse pear link from pear touch output')
   console.log(pearLink)
   console.log('\n--- set upgrade link ---')
