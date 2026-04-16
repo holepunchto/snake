@@ -60,10 +60,10 @@ function confirm(question) {
 }
 
 let pearLink = link
-if (pearLink !== null) {
+if (!pearLink) {
   console.log('\n--- touch ---')
   const out = await capture('pear touch')
-  pearLink = out.match(/pear:\/\/[a-z0-9.]+/)?.[0]
+  pearLink = out.match(/[a-z0-9.]+/)?.[0]
   if (!pearLink) throw new Error('failed to parse pear link from pear touch output')
   console.log(pearLink)
   console.log('\n--- set upgrade link ---')
