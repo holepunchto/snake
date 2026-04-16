@@ -60,7 +60,7 @@ function confirm(question) {
 }
 
 let pearLink = link
-if (!pearLink) {
+if (pearLink !== null) {
   console.log('\n--- touch ---')
   const out = await capture('pear touch')
   pearLink = out.match(/pear:\/\/[a-z0-9.]+/)?.[0]
