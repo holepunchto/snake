@@ -13,19 +13,23 @@
     "format": "prettier --write . && lunte --fix",
     "start": "electron-forge start -- --no-updates",
     "package": "electron-forge package",
+    "make": "electron-forge make",
     "make:darwin": "electron-forge make --platform=darwin",
     "make:win32": "electron-forge make --platform=win32",
-    "make:linux": "electron-forge package && ./scripts/build-app-image.sh",
+    "make:linux": "electron-forge make --platform=linux",
     "start:darwin": "./out/Snake-darwin-arm64/Snake.app/Contents/MacOS/Snake",
     "bootstrap": "node scripts/bootstrap.mjs",
     "test": "brittle test/*.test.js"
   },
   "dependencies": {
     "b4a": "^1.6.7",
+    "corestore": "^7.9.1",
+    "framed-stream": "^1.0.1",
+    "graceful-goodbye": "^1.3.3",
     "hypercore-crypto": "^3.4.2",
-    "hyperswarm": "^4.8.4",
+    "hyperswarm": "^4.17.0",
     "paparam": "^1.10.0",
-    "pear-runtime": "^0.5.0",
+    "pear-runtime": "^1.1.4",
     "which-runtime": "^1.3.2"
   },
   "devDependencies": {
@@ -38,6 +42,9 @@
     "electron-forge-plugin-prune-prebuilds": "^1.0.0",
     "electron-forge-plugin-universal-prebuilds": "^1.0.0",
     "lunte": "^1.6.0",
+    "pear-electron-forge-maker-appimage": "^2.0.0",
+    "pear-electron-forge-maker-flatpak": "^0.0.4",
+    "pear-electron-forge-maker-snap": "^0.0.10",
     "prettier": "^3.8.1",
     "prettier-config-holepunch": "^2.0.0"
   },

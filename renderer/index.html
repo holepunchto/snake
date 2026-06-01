@@ -79,11 +79,31 @@
         display: block;
         text-align: center;
       }
+
+      #update-banner {
+        position: fixed;
+        top: 30px;
+        left: 0;
+        right: 0;
+        background: #b0d944;
+        color: #001601;
+        text-align: center;
+        padding: 0.5rem;
+        font-family: monospace;
+        z-index: 10;
+      }
+
+      #update-banner button {
+        margin-left: 0.5rem;
+        border-color: #001601;
+        color: #001601;
+      }
     </style>
     <script type="module" src="app.js"></script>
   </head>
   <body>
     <div id="titlebar"></div>
+    <div id="update-banner" class="hidden"></div>
     <main>
       <div id="setup">
         <div>

@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain } = require('electron')
 const os = require('os')
 const path = require('path')
 const PearRuntime = require('pear-runtime')
+const FramedStream = require('framed-stream')
 
 const { isMac, isLinux, isWindows } = require('which-runtime')
 const { command, flag } = require('paparam')
@@ -9,16 +10,17 @@ const pkg = require('../package.json')
 const { name, productName, version, upgrade } = pkg
 
 const protocol = name
+const mainWorkerSpecifier = '/workers/main.js'
 
 const workers = new Map()
-let pear = null
 
 const appName = productName ?? name
 
 const cmd = command(
   appName,
   flag('--storage <dir>', 'pass custom storage to pear-runtime'),
-  flag('--no-updates', 'start without OTA updates')
+  flag('--no-updates', 'start without OTA updates'),
+  flag('--no-sandbox', 'start without Chromium sandbox').hide()
 )
 
 cmd.parse(app.isPackaged ? process.argv.slice(1) : process.argv.slice(2))
@@ -31,36 +33,6 @@ if (pearStore) app.setPath('userData', pearStore)
 ipcMain.on('pkg', (evt) => {
   evt.returnValue = pkg
 })
-
-function getPear() {
-  if (pear) return pear
-  const appPath = getAppPath()
-  let dir = null
-  if (pearStore) {
-    console.log('pear store: ' + pearStore)
-    dir = pearStore
-  } else if (appPath === null) {
-    dir = path.join(os.tmpdir(), 'pear', appName)
-  } else {
-    dir = isMac
-      ? path.join(os.homedir(), 'Library', 'Application Support', appName)
-      : isLinux
-        ? path.join(os.homedir(), '.config', appName)
-        : path.join(os.homedir(), 'AppData', 'Local', appName)
-  }
-
-  const extension = isLinux ? '.AppImage' : isMac ? '.app' : '.msix'
-  pear = new PearRuntime({
-    dir,
-    app: appPath,
-    updates,
-    version,
-    upgrade,
-    name: productName + extension
-  })
-  pear.on('error', console.error)
-  return pear
-}
 
 function getAppPath() {
   if (!app.isPackaged) return null
@@ -77,8 +49,37 @@ function sendToAll(name, data) {
 
 function getWorker(specifier) {
   if (workers.has(specifier)) return workers.get(specifier)
-  const pear = getPear()
-  const worker = pear.run(require.resolve('..' + specifier), [pear.storage])
+  const appPath = getAppPath()
+  let dir = null
+  if (pearStore) {
+    console.log('pear store: ' + pearStore)
+    dir = pearStore
+  } else if (appPath === null) {
+    dir = path.join(os.tmpdir(), 'pear', appName)
+  } else {
+    const isSnap = !!process.env.SNAP_USER_COMMON
+    const linuxConfigHome = process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config')
+    dir = isMac
+      ? path.join(os.homedir(), 'Library', 'Application Support', appName)
+      : isLinux
+        ? isSnap
+          ? path.join(process.env.SNAP_USER_COMMON, appName)
+          : path.join(linuxConfigHome, appName)
+        : path.join(os.homedir(), 'AppData', 'Roaming', appName)
+  }
+
+  const extension = isLinux ? '.AppImage' : isMac ? '.app' : '.msix'
+
+  const worker = PearRuntime.run(require.resolve('..' + specifier), [
+    dir,
+    appPath,
+    updates,
+    version,
+    upgrade,
+    productName + extension
+  ])
+  const pipe = new FramedStream(worker)
+
   function sendWorkerStdout(data) {
     sendToAll('pear:worker:stdout:' + specifier, data)
   }
@@ -89,26 +90,26 @@ function getWorker(specifier) {
     sendToAll('pear:worker:ipc:' + specifier, data)
   }
   function onBeforeQuit() {
-    worker.destroy()
+    pipe.destroy()
   }
   ipcMain.handle('pear:worker:writeIPC:' + specifier, (evt, data) => {
-    return worker.write(Buffer.from(data))
+    return pipe.write(data)
   })
-  workers.set(specifier, worker)
-  worker.on('data', sendWorkerIPC)
+  workers.set(specifier, pipe)
+  pipe.on('data', sendWorkerIPC)
   worker.stdout.on('data', sendWorkerStdout)
   worker.stderr.on('data', sendWorkerStderr)
   worker.once('exit', (code) => {
     app.removeListener('before-quit', onBeforeQuit)
     ipcMain.removeHandler('pear:worker:writeIPC:' + specifier)
-    worker.removeListener('data', sendWorkerIPC)
+    pipe.removeListener('data', sendWorkerIPC)
     worker.stdout.removeListener('data', sendWorkerStdout)
     worker.stderr.removeListener('data', sendWorkerStderr)
     sendToAll('pear:worker:exit:' + specifier, code)
     workers.delete(specifier)
   })
   app.on('before-quit', onBeforeQuit)
-  return worker
+  return pipe
 }
 
 async function createWindow() {
@@ -123,24 +124,6 @@ async function createWindow() {
     }
   })
 
-  const pear = getPear()
-
-  const onUpdating = () => {
-    if (!win.isDestroyed()) win.webContents.send('pear:event:updating')
-  }
-
-  const onUpdated = () => {
-    if (!win.isDestroyed()) win.webContents.send('pear:event:updated')
-  }
-
-  pear.updater.on('updating', onUpdating)
-  pear.updater.on('updated', onUpdated)
-
-  win.on('closed', () => {
-    pear.updater.removeListener('updating', onUpdating)
-    pear.updater.removeListener('updated', onUpdated)
-  })
-
   const devServerUrl = process.env.PEAR_DEV_SERVER_URL
 
   if (devServerUrl) {
@@ -152,12 +135,32 @@ async function createWindow() {
   await win.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'))
 }
 
-ipcMain.handle('pear:applyUpdate', () => getPear().updater.applyUpdate())
+ipcMain.handle('pear:applyUpdate', () => {
+  const pipe = getWorker(mainWorkerSpecifier)
+
+  return new Promise((resolve) => {
+    function onData(data) {
+      let msg = null
+      try {
+        msg = JSON.parse(data.toString())
+      } catch {
+        return
+      }
+      if (msg.type === 'updateApplied') {
+        pipe.removeListener('data', onData)
+        resolve()
+      }
+    }
+
+    pipe.on('data', onData)
+    pipe.write(Buffer.from(JSON.stringify({ type: 'applyUpdate' })))
+  })
+})
 ipcMain.handle('pear:startWorker', (evt, filename) => {
   getWorker(filename)
   return true
 })
-ipcMain.handle('app:restart', () => {
+ipcMain.handle('app:afterUpdate', () => {
   if (isLinux && process.env.APPIMAGE) {
     app.relaunch({
       execPath: process.env.APPIMAGE,
@@ -166,10 +169,10 @@ ipcMain.handle('app:restart', () => {
         ...process.argv.slice(1).filter((arg) => arg !== '--appimage-extract-and-run')
       ]
     })
-  } else {
+  } else if (!isWindows) {
     app.relaunch()
   }
-  app.exit(0)
+  app.quit()
 })
 
 function handleDeepLink(url) {

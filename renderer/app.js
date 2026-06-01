@@ -10,44 +10,76 @@ function sendToWorker(msg) {
 
 bridge.startWorker(WORKER)
 
-bridge.onWorkerIPC(WORKER, (data) => {
-  const messages = decoder.decode(data).split('\n').filter(Boolean)
-  for (const data of messages) {
-    const msg = JSON.parse(data)
-    const game = document.querySelector('pear-snake')
+function showUpdating() {
+  const banner = document.querySelector('#update-banner')
+  banner.textContent = 'Updating...'
+  banner.classList.remove('hidden')
+}
 
-    if (msg.type === 'ready') {
-      const topicBuffer = hexToBytes(msg.topic)
-      document.querySelector('#game-topic').innerText = msg.topic
-      document.querySelector('#loading').classList.add('hidden')
-      document.querySelector('#game').classList.remove('hidden')
-      game.start(msg.id, topicBuffer)
-    } else if (msg.type === 'connected') {
-      if (!game.players.has(msg.id)) {
-        game.addPlayer(new Player(msg.id, game))
-      }
-    } else if (msg.type === 'disconnected') {
-      const player = game.players.get(msg.id)
-      if (player) game.dropPlayer(player)
-    } else if (msg.type === 'data') {
-      let state = null
-      try {
-        state = JSON.parse(msg.payload)
-      } catch {
-        return
-      }
-      const player = game.players.get(state.id)
-      if (player) {
-        if (state.drop) {
-          game.dropPlayer(player)
-        } else if (state.snake) {
-          if (state.snake.length > player.snake.length) game.food = state.food
-          player.snake = state.snake
-        }
-      }
-    } else if (msg.type === 'update') {
-      document.querySelector('#peers-count').textContent = msg.connections
+function showUpdateReady() {
+  const banner = document.querySelector('#update-banner')
+  banner.textContent = ''
+  banner.classList.remove('hidden')
+  const btn = document.createElement('button')
+  btn.id = 'update-btn'
+  btn.textContent = 'Apply update'
+  btn.onclick = async () => {
+    btn.disabled = true
+    btn.textContent = 'Applying...'
+    try {
+      await bridge.applyUpdate()
+      await bridge.appAfterUpdate()
+    } catch (err) {
+      banner.textContent = 'Update failed: ' + err.message
     }
+  }
+  banner.appendChild(btn)
+}
+
+bridge.onWorkerIPC(WORKER, (data) => {
+  let msg = null
+  try {
+    msg = JSON.parse(decoder.decode(data))
+  } catch {
+    return
+  }
+  const game = document.querySelector('pear-snake')
+
+  if (msg.type === 'updating') {
+    showUpdating()
+  } else if (msg.type === 'updated') {
+    showUpdateReady()
+  } else if (msg.type === 'ready') {
+    const topicBuffer = hexToBytes(msg.topic)
+    document.querySelector('#game-topic').innerText = msg.topic
+    document.querySelector('#loading').classList.add('hidden')
+    document.querySelector('#game').classList.remove('hidden')
+    game.start(msg.id, topicBuffer)
+  } else if (msg.type === 'connected') {
+    if (!game.players.has(msg.id)) {
+      game.addPlayer(new Player(msg.id, game))
+    }
+  } else if (msg.type === 'disconnected') {
+    const player = game.players.get(msg.id)
+    if (player) game.dropPlayer(player)
+  } else if (msg.type === 'data') {
+    let state = null
+    try {
+      state = JSON.parse(msg.payload)
+    } catch {
+      return
+    }
+    const player = game.players.get(state.id)
+    if (player) {
+      if (state.drop) {
+        game.dropPlayer(player)
+      } else if (state.snake) {
+        if (state.snake.length > player.snake.length) game.food = state.food
+        player.snake = state.snake
+      }
+    }
+  } else if (msg.type === 'update') {
+    document.querySelector('#peers-count').textContent = msg.connections
   }
 })
 
