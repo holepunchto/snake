@@ -65,6 +65,12 @@ type EngineHooks = {
 
 export class SnakeGame {
   players = new Map<string, Player>()
+  // Peers the swarm is currently connected to. Deliberately separate from
+  // `players`, which holds only the snakes alive on the board: dying removes a
+  // player from `players` while their connection stays up, so this is what
+  // tells us a state update belongs to a peer that respawned rather than to one
+  // that has gone away.
+  connected = new Set<string>()
   speed = SPEED
   food: Coord | null = null
   player: Player | null = null
@@ -137,6 +143,11 @@ export class SnakeGame {
 
   tick() {
     if (this.topicBuffer === null) return
+    // A dropped player is out of the game until they hit "Play again". The loop
+    // keeps running (it still broadcasts the drop and renders the opponents who
+    // are still playing), but their snake must stop moving: otherwise it wanders
+    // the board invisibly and eats the shared pear out from under everyone else.
+    if (this.drop) return
     if (this.food === null) this.food = this.pos()
     const ate = this.player!.tick(this.food)
     if (ate) this.food = this.pos()
@@ -168,19 +179,24 @@ export class SnakeGame {
   leave() {
     this.destroy()
     this.players.clear()
+    // Forget who was connected as well, so peers still broadcasting on the old
+    // topic cannot reappear on the board of whatever game is joined next.
+    this.connected.clear()
     this.food = null
     this.player = null
     this.drop = false
     this.topicBuffer = null
   }
 
-  // Restart the local player on the same topic without tearing down the swarm.
+  // Respawn the local player on the same topic without tearing down the swarm.
+  // The food is left alone: it belongs to the game every peer is sharing, not to
+  // this player's run, so putting it back at the topic's starting cell would
+  // teleport the pear for everyone still playing.
   reset() {
     if (!this.topicBuffer || !this.player) return
     const id = this.player.id
     this.dropPlayer(this.player)
     this.drop = false
-    this.food = { x: this.topicBuffer[0] % TILES, y: this.topicBuffer[1] % TILES }
     this.player = new Player(id, this)
     this.addPlayer(this.player)
     this.hooks.onChange()
@@ -225,20 +241,35 @@ export class SnakeGame {
   // --- peer events, forwarded from the worker by the view layer ---
 
   addPeer(id: string) {
+    this.connected.add(id)
     if (!this.players.has(id)) this.addPlayer(new Player(id, this))
   }
 
   removePeer(id: string) {
+    this.connected.delete(id)
     const player = this.players.get(id)
     if (player) this.dropPlayer(player)
   }
 
   applyPeerState(state: PeerState) {
-    const player = this.players.get(state.id)
-    if (!player) return
+    let player = this.players.get(state.id)
+
     if (state.drop) {
-      this.dropPlayer(player)
-    } else if (state.snake) {
+      if (player) this.dropPlayer(player)
+      return
+    }
+
+    if (!player) {
+      // A connected peer we are not tracking a snake for has hit "Play again":
+      // their `drop` broadcast took them off the board and, because the swarm
+      // connection never went away, no `connected` event puts them back. Anyone
+      // else is a peer that has actually left, so stay dropped.
+      if (!this.connected.has(state.id)) return
+      player = new Player(state.id, this)
+      this.addPlayer(player)
+    }
+
+    if (state.snake) {
       if (state.snake.length > player.snake.length) this.food = state.food
       player.snake = state.snake
     }

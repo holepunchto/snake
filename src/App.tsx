@@ -162,6 +162,9 @@ export default function App() {
   }
 
   function leaveGame() {
+    // Tell the worker to actually leave the swarm topic, not just drop the local
+    // board — otherwise the old game's peers stay connected and keep streaming.
+    sendToWorker({ type: 'leave' })
     game.leave()
     setOver(false)
     setPeers(0)

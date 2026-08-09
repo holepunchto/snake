@@ -43,12 +43,32 @@ pear.updater.on('updated', () => send({ type: 'updated' }))
 
 const gameSwarm = new Hyperswarm()
 
+// Only one game topic is ever joined at a time. `joined` holds it while a game
+// is live and doubles as the gate below: leaving stops us announcing the topic,
+// but a peer that is still in that game may hold our key and dial back in.
+let joined = null
+
+// Join and leave are serialised so that a quick Leave -> Join cannot leave two
+// discovery sessions for the same topic racing each other.
+let commands = Promise.resolve()
+
+function enqueue(fn) {
+  commands = commands.then(fn).catch(console.error)
+}
+
 function send(msg) {
   pipe.write(Buffer.from(JSON.stringify(msg)))
 }
 
 gameSwarm.on('connection', (peer) => {
   const id = b4a.toString(peer.remotePublicKey, 'hex').slice(0, 6)
+
+  if (joined === null) {
+    peer.on('error', () => {})
+    peer.destroy()
+    return
+  }
+
   send({ type: 'connected', id })
 
   peer.on('data', (message) => {
@@ -69,12 +89,27 @@ gameSwarm.on('update', () => {
 })
 
 async function joinGame(topicHex) {
+  await leaveGame()
   const topicBuffer = topicHex ? b4a.from(topicHex, 'hex') : crypto.randomBytes(32)
   const topic = b4a.toString(topicBuffer, 'hex')
   const id = b4a.toString(gameSwarm.keyPair.publicKey, 'hex').slice(0, 6)
+  joined = topicBuffer
   const discovery = gameSwarm.join(topicBuffer, { client: true, server: true })
   await discovery.flushed()
   send({ type: 'ready', id, topic })
+}
+
+// Stop announcing the topic and drop the peers it found. hyperswarm keeps
+// connections open across leave(), so without the explicit destroy the peers of
+// a game the player has left keep streaming their state, and rejoining that
+// same topic never re-emits 'connection' for them — they stay invisible.
+async function leaveGame() {
+  if (joined === null) return
+  const topic = joined
+  joined = null
+  await gameSwarm.leave(topic)
+  // snapshot: destroying removes the connection from the live set
+  for (const peer of [...gameSwarm.connections]) peer.destroy()
 }
 
 pipe.on('data', async (data) => {
@@ -85,7 +120,9 @@ pipe.on('data', async (data) => {
     return
   }
   if (msg.type === 'join') {
-    joinGame(msg.topic).catch(console.error)
+    enqueue(() => joinGame(msg.topic))
+  } else if (msg.type === 'leave') {
+    enqueue(() => leaveGame())
   } else if (msg.type === 'send') {
     for (const peer of gameSwarm.connections) {
       peer.write(msg.data)
