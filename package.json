@@ -3,7 +3,7 @@
   "productName": "Snake",
   "version": "1.0.2",
   "description": "P2P multiplayer snake game for mobile, built on Pear",
-  "upgrade": "pear://bc88yd4zd3ejmb13gk56egf5zpo8yexybryt4dgb9nzpupo9gi6o",
+  "upgrade": "pear://q6buti8q55spch9nun4zpxpte3i44po7ow1z19qw4q7443xuw5gy",
   "main": "index.ts",
   "imports": {
     "pear-runtime": {
