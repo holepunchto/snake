@@ -1,4 +1,4 @@
-const PearRuntime = require('pear-runtime') // pear-runtime on desktop; pear-mobile on mobile (see package.json "imports")
+const PearRuntime = require('pear-mobile') // pear-runtime on desktop; pear-mobile on mobile (see package.json "imports")
 const Hyperswarm = require('hyperswarm')
 const Corestore = require('corestore')
 const goodbye = require('graceful-goodbye')
@@ -29,7 +29,10 @@ const store = new Corestore(path.join(updaterConfig.dir, 'pear-runtime', 'corest
 const updaterSwarm = new Hyperswarm()
 const pear = new PearRuntime({ ...updaterConfig, swarm: updaterSwarm, store })
 
-pear.updater.on('error', console.error)
+pear.updater.on('error', (err) => {
+  console.error(err)
+  send({ type: 'updateFailed', error: err.message || String(err) })
+})
 if (updaterConfig.updates !== false) {
   updaterSwarm.on('connection', (connection) => store.replicate(connection))
   updaterSwarm.join(pear.updater.drive.core.discoveryKey, {

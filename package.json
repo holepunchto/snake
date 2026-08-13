@@ -3,7 +3,7 @@
   "productName": "Snake",
   "version": "1.0.2",
   "description": "P2P multiplayer snake game for mobile, built on Pear",
-  "upgrade": "pear://wk3dcbstyqo9sd9tgdyrqynje5of3z44rbekj6j81355dpa79ixo",
+  "upgrade": "pear://bc88yd4zd3ejmb13gk56egf5zpo8yexybryt4dgb9nzpupo9gi6o",
   "main": "index.ts",
   "imports": {
     "pear-runtime": {
@@ -16,7 +16,7 @@
   "scripts": {
     "bundle:bare": "npx bare-pack --host ios-arm64 --host ios-arm64-simulator --host ios-x64-simulator --host android-arm64 --linked --out ./src/worker.bundle.js ./workers/main.js",
     "bundle:react-native": "npx react-native bundle --platform ios --dev false --entry-file index.ts --bundle-output out/ios/Snake/app.bundle --assets-dest out/ios/Snake && npx react-native bundle --platform android --dev false --entry-file index.ts --bundle-output out/android/Snake/app.bundle --assets-dest out/android/Snake",
-    "build": "npx pear-build --ios-arm64 ./out/ios/Snake --ios-arm64-simulator ./out/ios/Snake --ios-x64-simulator ./out/ios/Snake --android-arm64 ./out/android/Snake --package ./package.json --target dist",
+    "build": "npx pear-build --ios-arm64 ./out/ios/Snake --ios-arm64-simulator ./out/ios/Snake --ios-x64-simulator ./out/ios/Snake --android-arm64 ./out/android/Snake --package ./package.json --target dist && cp -f pear.json dist/pear.json",
     "update": "npm run bundle:bare && npm run bundle:react-native && npm run build",
     "eas-build-post-install": "npm run bundle:bare",
     "prebuild": "npx expo prebuild",
@@ -51,9 +51,8 @@
     "graceful-goodbye": "^1.3.3",
     "hypercore-crypto": "^3.4.2",
     "hyperswarm": "^4.17.0",
-    "pear-mobile": "^4.2.2",
-    "pear-runtime": "^1.3.1",
-    "pear-runtime-react-native": "^2.0.1",
+    "pear-mobile": "file:../pear-mobile/pear-mobile-4.2.2.tgz",
+    "pear-runtime-react-native": "file:../pear-runtime-react-native/pear-runtime-react-native-2.0.1.tgz",
     "react": "19.2.0",
     "react-native": "0.83.2",
     "react-native-bare-kit": "^0.12.0",

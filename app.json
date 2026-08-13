@@ -9,8 +9,6 @@
     "backgroundColor": "#001601",
     "plugins": [
       ["pear-runtime-react-native/plugin"],
-      ["./plugins/with-metro-port"],
-      ["./plugins/with-pear-ota-android"],
       [
         "expo-build-properties",
         {
