@@ -3,7 +3,7 @@
   "productName": "Snake",
   "version": "1.0.2",
   "description": "P2P multiplayer snake game for mobile, built on Pear",
-  "upgrade": "pear://q6buti8q55spch9nun4zpxpte3i44po7ow1z19qw4q7443xuw5gy",
+  "upgrade": "pear://wzb61nr58o1mecgwq7nq441ntbraqkmarardh8gpec3skwxw719o",
   "main": "index.ts",
   "imports": {
     "pear-runtime": {
@@ -53,6 +53,7 @@
     "hyperswarm": "^4.17.0",
     "pear-mobile": "file:vendor/pear-mobile-4.2.2.tgz",
     "pear-runtime-react-native": "file:vendor/pear-runtime-react-native-2.0.1.tgz",
+    "pear-runtime-updater": "file:vendor/pear-runtime-updater-3.3.0.tgz",
     "react": "19.2.0",
     "react-native": "0.83.2",
     "react-native-bare-kit": "^0.12.0",
