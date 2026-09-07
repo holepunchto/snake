@@ -10,7 +10,6 @@ const pkg = require('../package.json')
 const { name, productName, version, upgrade } = pkg
 
 const protocol = name
-const mainWorkerSpecifier = '/workers/main.js'
 
 const workers = new Map()
 
@@ -71,12 +70,12 @@ function getWorker(specifier) {
   const extension = isLinux ? '.AppImage' : isMac ? '.app' : '.msix'
 
   const worker = PearRuntime.run(require.resolve('..' + specifier), [
-    dir,
-    appPath,
-    updates,
+    String(updates),
     version,
     upgrade,
-    productName + extension
+    productName + extension,
+    dir,
+    ...(appPath === null ? [] : [appPath])
   ])
   const pipe = new FramedStream(worker)
 
@@ -116,6 +115,7 @@ async function createWindow() {
   const win = new BrowserWindow({
     width: 900,
     height: 760,
+    backgroundColor: '#001601',
     webPreferences: {
       preload: path.join(__dirname, '..', 'electron', 'preload.js'),
       sandbox: true,
@@ -135,27 +135,6 @@ async function createWindow() {
   await win.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'))
 }
 
-ipcMain.handle('pear:applyUpdate', () => {
-  const pipe = getWorker(mainWorkerSpecifier)
-
-  return new Promise((resolve) => {
-    function onData(data) {
-      let msg = null
-      try {
-        msg = JSON.parse(data.toString())
-      } catch {
-        return
-      }
-      if (msg.type === 'updateApplied') {
-        pipe.removeListener('data', onData)
-        resolve()
-      }
-    }
-
-    pipe.on('data', onData)
-    pipe.write(Buffer.from(JSON.stringify({ type: 'applyUpdate' })))
-  })
-})
 ipcMain.handle('pear:startWorker', (evt, filename) => {
   getWorker(filename)
   return true

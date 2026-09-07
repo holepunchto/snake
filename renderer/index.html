@@ -55,6 +55,24 @@
         justify-content: center;
       }
 
+      #title-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 40px;
+      }
+
+      #title-row img {
+        width: 34px;
+        height: 46px;
+        margin-right: 12px;
+        object-fit: contain;
+      }
+
+      #title-row span {
+        color: #b0d944;
+        font-size: 40px;
+      }
+
       #or {
         margin: 1.5rem auto;
       }
@@ -67,6 +85,82 @@
       #details {
         background: #000;
         border: 1px solid #b0d944;
+      }
+
+      #game-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.5em;
+      }
+
+      #leave-game {
+        border: none;
+        padding: 0.2rem;
+      }
+
+      #score-line {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        color: #b0d944;
+        font-size: 1rem;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid rgba(176, 217, 68, 0.3);
+        background: #000;
+        padding: 3px 6px;
+        margin: 2px;
+        color: #fff;
+        font-size: 12px;
+      }
+
+      .chip.me {
+        border-color: #b0d944;
+      }
+
+      .chip.more {
+        border-color: rgba(176, 217, 68, 0.2);
+        color: #b0d944;
+        opacity: 0.7;
+      }
+
+      .swatch {
+        width: 10px;
+        height: 10px;
+        margin-right: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+      }
+
+      #board-wrap {
+        position: relative;
+      }
+
+      #game-over {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.6);
+      }
+
+      #game-over-title {
+        color: #b0d944;
+        font-size: 32px;
+        margin-bottom: 20px;
+      }
+
+      #final-score {
+        color: #b0d944;
+        font-size: 18px;
+        margin-bottom: 20px;
       }
 
       #details {
@@ -106,19 +200,41 @@
     <div id="update-banner" class="hidden"></div>
     <main>
       <div id="setup">
+        <div id="title-row">
+          <img src="../assets/pear.png" alt="" />
+          <span>Snake</span>
+        </div>
         <div>
           <button id="create-game">Create</button>
         </div>
         <div id="or">- or -</div>
         <form id="join-form">
           <button type="submit" id="join-game">Join</button>
-          <input required id="join-game-topic" type="text" placeholder="Game Topic" />
+          <input
+            required
+            id="join-game-topic"
+            type="text"
+            placeholder="Game Topic"
+            pattern="[0-9a-fA-F]{64}"
+            title="64-character game topic (hex)"
+          />
         </form>
       </div>
       <div id="loading" class="hidden">Loading ...</div>
 
       <div id="game" class="hidden">
-        <pear-snake></pear-snake>
+        <div id="game-header">
+          <button id="leave-game">&lsaquo; Leave</button>
+          <div id="score-line"></div>
+        </div>
+        <div id="board-wrap">
+          <pear-snake></pear-snake>
+          <div id="game-over" class="hidden">
+            <div id="game-over-title">Game Over</div>
+            <div id="final-score"></div>
+            <button id="play-again">Play again</button>
+          </div>
+        </div>
         <div id="details">
           <div>Topic: <span id="game-topic"></span></div>
           <div>Peers: <span id="peers-count">0</span></div>
