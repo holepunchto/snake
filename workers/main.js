@@ -100,7 +100,6 @@ async function leaveGame() {
   const topic = joined
   joined = null
   await gameSwarm.leave(topic)
-  // snapshot: destroying removes the connection from the live set
   for (const peer of [...gameSwarm.connections]) peer.destroy()
 }
 
