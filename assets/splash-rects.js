@@ -1,8 +1,3 @@
-// Generated from the app icon (snake-mobile scratchpad icon-work/gen2.js) — the
-// snake glyph as axis-aligned bars in a 1024x1024 viewbox. `o` orders the body
-// draw-in from tail (0) to head (1). Keep in sync with
-// ../snake-mobile/src/components/splash-rects.ts
-
 export const SPLASH_VIEWBOX = 1024
 
 export const SPLASH_RECTS = [

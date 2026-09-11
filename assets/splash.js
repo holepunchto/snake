@@ -1,10 +1,5 @@
 import { SPLASH_RECTS, SPLASH_VIEWBOX } from './splash-rects.js'
 
-// Boot animation, ported from the mobile app (AnimatedSplash.tsx): the snake
-// glyph draws itself in bar by bar from tail to head, flicks its tongue, and
-// 'PEAR SNAKE' types out under a blinking block cursor, the running version
-// fades in beneath it, and the whole overlay then fades into the app.
-
 const ACCENT = '#b0d944'
 const BACKGROUND = '#001601'
 
