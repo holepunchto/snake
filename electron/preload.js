@@ -9,7 +9,7 @@ contextBridge.exposeInMainWorld('bridge', {
   pkg() {
     return ipcRenderer.sendSync('pkg')
   },
-  applyUpdate: () => ipcRenderer.invoke('pear:applyUpdate'),
+
   appAfterUpdate: () => ipcRenderer.invoke('app:afterUpdate'),
   startWorker: (specifier) => ipcRenderer.invoke('pear:startWorker', specifier),
   onWorkerStdout: (specifier, listener) => {
