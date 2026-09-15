@@ -116,6 +116,10 @@ async function createWindow() {
     width: 900,
     height: 760,
     backgroundColor: '#001601',
+    titleBarStyle: 'hidden',
+    ...(isMac
+      ? { trafficLightPosition: { x: 10, y: 9 } }
+      : { titleBarOverlay: { color: '#0d2506', symbolColor: '#b0d944', height: 30 } }),
     webPreferences: {
       preload: path.join(__dirname, '..', 'electron', 'preload.js'),
       sandbox: true,

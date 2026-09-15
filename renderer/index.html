@@ -18,13 +18,35 @@
       button,
       input {
         all: unset;
-        border: 1px ridge #b0d944;
+        border: 1px solid #b0d944;
         background: #000;
         color: #b0d944;
         padding: 0.45rem;
         font-family: monospace;
         font-size: 1rem;
         line-height: 1rem;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: rgba(176, 217, 68, 0.15);
+      }
+
+      button:active {
+        background: #b0d944;
+        color: #001601;
+      }
+
+      button:disabled {
+        opacity: 0.35;
+        cursor: default;
+      }
+
+      input::placeholder {
+        color: #6f8a2e;
       }
 
       body {
@@ -98,6 +120,13 @@
       #leave-game {
         border: none;
         padding: 0.2rem;
+      }
+
+      #leave-game:hover,
+      #leave-game:active {
+        background: transparent;
+        color: #b0d944;
+        opacity: 0.7;
       }
 
       #score-line {
@@ -188,9 +217,22 @@
       }
 
       #update-banner button {
-        margin-left: 0.5rem;
+        margin-left: 12px;
+        padding: 4px 10px;
+        background: transparent;
         border-color: #001601;
         color: #001601;
+      }
+
+      #update-banner button:hover {
+        background: rgba(0, 22, 1, 0.1);
+      }
+
+      #update-banner button:active,
+      #update-banner button:disabled {
+        background: transparent;
+        color: #001601;
+        opacity: 0.6;
       }
     </style>
     <script type="module" src="app.js"></script>
