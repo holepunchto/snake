@@ -46,6 +46,10 @@ Start a second instance:
 npm start -- --storage /tmp/second-instance
 ```
 
+## Releases
+
+Builds, signing credentials, artifacts, and Pear staging are managed in [pear-snake-ci-build](https://github.com/geordangesink/pear-snake-ci-build). Run **Build Snake Desktop** from its [Actions page](https://github.com/geordangesink/pear-snake-ci-build/actions); see the [build and staging guide](https://github.com/geordangesink/pear-snake-ci-build#desktop) for setup and options.
+
 ## Quick Deploy
 
 ### Bootstrap
