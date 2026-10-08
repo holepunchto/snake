@@ -22,7 +22,8 @@ renderer (sandboxed)
 | ----------------- | --------------------------------- | ------------------------------------------- |
 | renderer → worker | `{ type: 'join', topic }`         | Join or create a game (null topic = create) |
 | renderer → worker | `{ type: 'send', data }`          | Broadcast game state to peers               |
-| worker → renderer | `{ type: 'ready', id, topic }`    | Swarm flushed, game can start               |
+| worker → renderer | `{ type: 'ready', id, topic }`    | Game can start while announcing its topic   |
+| worker → renderer | `{ type: 'flushed', topic }`      | Topic announced and ready to share          |
 | worker → renderer | `{ type: 'connected', id }`       | Peer joined                                 |
 | worker → renderer | `{ type: 'disconnected', id }`    | Peer dropped                                |
 | worker → renderer | `{ type: 'data', id, payload }`   | Game state from a peer                      |

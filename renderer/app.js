@@ -18,6 +18,13 @@ function sendToWorker(msg) {
 bridge.startWorker(WORKER)
 
 let shouldReload = false
+let joinCode = { topic: '', status: 'announcing' }
+
+function renderJoinCode() {
+  const { topic, status } = joinCode
+  document.querySelector('#game-topic').textContent = topic
+  document.querySelector('#game-status').textContent = topic && status
+}
 
 function showUpdating() {
   const banner = document.querySelector('#update-banner')
@@ -70,11 +77,15 @@ bridge.onWorkerIPC(WORKER, (data) => {
     showUpdateFailed(msg.error)
   } else if (msg.type === 'ready') {
     const topicBuffer = hexToBytes(msg.topic)
-    document.querySelector('#game-topic').innerText = msg.topic
+    joinCode = { topic: msg.topic, status: 'announcing' }
+    renderJoinCode()
     document.querySelector('#loading').classList.add('hidden')
     document.querySelector('#game').classList.remove('hidden')
     hideGameOver()
     game.start(msg.id, topicBuffer)
+  } else if (msg.type === 'flushed' && msg.topic === joinCode.topic) {
+    joinCode.status = 'online'
+    renderJoinCode()
   } else if (msg.type === 'connected') {
     game.addPeer(msg.id)
   } else if (msg.type === 'disconnected') {
@@ -125,11 +136,12 @@ function joinGame(e) {
 }
 
 function leaveGame() {
+  joinCode = { topic: '', status: 'announcing' }
+  renderJoinCode()
   sendToWorker({ type: 'leave' })
   document.querySelector('pear-snake').leave()
   hideGameOver()
   document.querySelector('#peers-count').textContent = 0
-  document.querySelector('#game-topic').innerText = ''
   document.querySelector('#game').classList.add('hidden')
   document.querySelector('#setup').classList.remove('hidden')
 }
