@@ -1,7 +1,7 @@
 {
   "multisig": {
-    "publicKeys": ["<PUBKEY_HERE>", "<PUBKEY_HERE>", "<PUBKEY_HERE>"],
+    "publicKeys": ["6r66j69bjqfns5ims4z6c4b48c6a863mtuxqy5xmq6y6a9x3uiiy", "u89ir485kwi9t3r6w1wcwm7y5k4k4j5u9y9kaafz1d5spbxzypro", "8pkpfikwx33qdsopkkyw9mzxxjmgk8188ciwz5qpdozuwx8du1eo", "4idukhkas1sy6md8bmmkad48m7pcmmfhifd48umsxszhx37r9zho", "sh9st5zthf9boqe6xjpk95nz86job9u4innexezi5qmduaz51ihy"],
     "namespace": "holepunchto/snake",
-    "quorum": 2
+    "quorum": 3
   }
 }
