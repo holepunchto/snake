@@ -2,6 +2,7 @@
   "name": "snake",
   "productName": "Snake",
   "version": "1.0.0",
+  "upgrade": "pear://n3jfnxaqoygqfs6mfchu7ire8frscr3cs5wuxtkaokbub3eu6pko",
   "description": "P2P multiplayer snake game",
   "license": "Apache-2.0",
   "author": "Holepunch Inc.",
@@ -47,6 +48,5 @@
     "pear-electron-forge-maker-snap": "^0.0.10",
     "prettier": "^3.8.1",
     "prettier-config-holepunch": "^2.0.0"
-  },
-  "upgrade": ""
+  }
 }
