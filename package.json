@@ -2,7 +2,7 @@
   "name": "snake",
   "productName": "Snake",
   "version": "1.0.0",
-  "upgrade": "pear://n3jfnxaqoygqfs6mfchu7ire8frscr3cs5wuxtkaokbub3eu6pko",
+  "upgrade": "pear://huezbke3irkuyi564cpz1ncfgk39eozwqxyihes5ymyy71i5589y",
   "description": "P2P multiplayer snake game",
   "license": "Apache-2.0",
   "author": "Holepunch Inc.",
