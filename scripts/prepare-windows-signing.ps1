@@ -1,3 +1,4 @@
+# TODO: Remove this script and its usages once we hardcode Publisher in AppxManifest.xml
 $ErrorActionPreference = 'Stop'
 
 $certificate = Get-Item "Cert:\CurrentUser\My\$env:WINDOWS_CERT_SHA1"
