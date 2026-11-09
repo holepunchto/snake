@@ -9,7 +9,7 @@ runSplash(bridge.pkg().version)
 const pearImage = new Image()
 pearImage.src = '../assets/pear.png'
 
-const WORKER = '/workers/main.js'
+const WORKER = 'snake-core'
 
 function sendToWorker(msg) {
   bridge.writeWorkerIPC(WORKER, encoder.encode(JSON.stringify(msg)))
