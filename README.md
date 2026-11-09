@@ -6,7 +6,7 @@ As made in [Pear Workshop](https://github.com/holepunchto/pear-workshop).
 
 ## Architecture
 
-The app runs as a standard Electron application. The shared `snake-core` module starts an embedded [Bare](https://github.com/nicolo-ribaudo/bare) worker through `pear-runtime`. Peer-to-peer networking via [Hyperswarm](https://github.com/holepunchto/hyperswarm) and updates run inside that worker. The renderer communicates with the worker over a simple JSON IPC protocol bridged through the Electron main process.
+The app runs as a standard Electron application. The shared [snake-core](https://github.com/holepunchto/snake-core) module starts an embedded [Bare](https://github.com/holepunchto/bare) worker through `pear-runtime`. Peer-to-peer networking via [Hyperswarm](https://github.com/holepunchto/hyperswarm) and updates run inside that worker. The renderer communicates with the worker over a simple JSON IPC protocol bridged through the Electron main process.
 
 ```
 renderer (sandboxed)
