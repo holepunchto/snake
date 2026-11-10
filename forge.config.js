@@ -145,7 +145,7 @@ module.exports = {
         if (result.platform === 'darwin' && process.env.MAC_CODESIGN_IDENTITY) {
           run(
             'bash',
-            'sign-macos-artifacts.sh',
+            'sign-macos-dmg.sh',
             path.join(__dirname, 'out', `${appName}-darwin-${result.arch}`, `${appName}.app`),
             result.artifacts[0]
           )
