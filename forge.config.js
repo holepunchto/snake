@@ -1,15 +1,7 @@
 const fs = require('fs')
 const path = require('path')
-const { execFileSync } = require('child_process')
 const pkg = require('./package.json')
 const appName = pkg.productName ?? pkg.name
-
-function run(command, script, ...args) {
-  execFileSync(command, [path.join(__dirname, 'scripts', script), ...args], {
-    cwd: __dirname,
-    stdio: 'inherit'
-  })
-}
 
 function getWindowsKitVersion() {
   const programFiles = process.env['PROGRAMFILES(X86)'] || process.env.PROGRAMFILES
@@ -135,10 +127,6 @@ module.exports = {
       const msixVersion = pkg.version.replace(/^(\d+\.\d+\.\d+)$/, '$1.0')
       const xml = fs.readFileSync(manifest, 'utf-8')
       fs.writeFileSync(manifest, xml.replace(/Version="[^"]*"/, `Version="${msixVersion}"`))
-
-      if (process.env.WINDOWS_CERT_SHA1) {
-        run('pwsh', 'prepare-windows-signing.ps1')
-      }
     },
     postMake: async (forgeConfig, results) => {
       for (const result of results) {
