@@ -142,14 +142,6 @@ module.exports = {
     },
     postMake: async (forgeConfig, results) => {
       for (const result of results) {
-        if (result.platform === 'darwin' && process.env.MAC_CODESIGN_IDENTITY) {
-          run(
-            'bash',
-            'sign-macos-dmg.sh',
-            path.join(__dirname, 'out', `${appName}-darwin-${result.arch}`, `${appName}.app`),
-            result.artifacts[0]
-          )
-        }
         if (result.platform !== 'win32') continue
         for (const artifact of result.artifacts) {
           if (!artifact.endsWith('.msix')) continue
