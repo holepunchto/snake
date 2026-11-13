@@ -11,7 +11,7 @@
     <DisplayName>Snake</DisplayName>
     <PublisherDisplayName>Holepunch Inc.</PublisherDisplayName>
     <Description>P2P multiplayer snake game</Description>
-    <Logo>build\icon.png</Logo>
+    <Logo>assets\icon.png</Logo>
     <desktop6:FileSystemWriteVirtualization>disabled</desktop6:FileSystemWriteVirtualization>
   </Properties>
   <Resources>
@@ -27,7 +27,7 @@
   </Capabilities>
   <Applications>
     <Application Id="App" Executable="app\Snake.exe" EntryPoint="Windows.FullTrustApplication">
-      <uap:VisualElements DisplayName="Snake" Description="P2P multiplayer snake game" Square150x150Logo="build\icon.png" Square44x44Logo="build\icon.png" BackgroundColor="transparent" />
+      <uap:VisualElements DisplayName="Snake" Description="P2P multiplayer snake game" Square150x150Logo="assets\icon.png" Square44x44Logo="assets\icon.png" BackgroundColor="transparent" />
     </Application>
   </Applications>
 </Package>
