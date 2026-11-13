@@ -23,26 +23,10 @@ function getWindowsKitVersion() {
   }
 }
 
-let packagerConfig = {
+const packagerConfig = {
   icon: 'build/icon',
   protocols: [{ name: appName, schemes: [pkg.name] }],
   derefSymlinks: true
-}
-
-if (process.env.MAC_CODESIGN_IDENTITY) {
-  packagerConfig = {
-    ...packagerConfig,
-    osxSign: {
-      identity: process.env.MAC_CODESIGN_IDENTITY,
-      optionsForFile: () => ({
-        entitlements: path.join(__dirname, 'build', 'entitlements.mac.plist')
-      })
-    },
-    osxNotarize: {
-      tool: 'notarytool',
-      keychainProfile: process.env.KEYCHAIN_PROFILE
-    }
-  }
 }
 
 module.exports = {
@@ -59,14 +43,9 @@ module.exports = {
       platforms: ['win32'],
       config: {
         appManifest: path.join(__dirname, 'build', 'AppxManifest.xml'),
+        packageAssets: path.join(__dirname, 'build'),
         windowsKitVersion: getWindowsKitVersion(),
-        ...(process.env.WINDOWS_SIGN_HOOK
-          ? {
-              windowsSignOptions: {
-                hookModulePath: process.env.WINDOWS_SIGN_HOOK
-              }
-            }
-          : {})
+        sign: false
       }
     },
     {
@@ -127,21 +106,6 @@ module.exports = {
       const msixVersion = pkg.version.replace(/^(\d+\.\d+\.\d+)$/, '$1.0')
       const xml = fs.readFileSync(manifest, 'utf-8')
       fs.writeFileSync(manifest, xml.replace(/Version="[^"]*"/, `Version="${msixVersion}"`))
-    },
-    postMake: async (forgeConfig, results) => {
-      for (const result of results) {
-        if (result.platform !== 'win32') continue
-        for (const artifact of result.artifacts) {
-          if (!artifact.endsWith('.msix')) continue
-          const standardDir = path.join(__dirname, 'out', `${appName}-win32-${result.arch}`)
-          fs.mkdirSync(standardDir, { recursive: true })
-          const dest = path.join(standardDir, path.basename(artifact))
-          fs.renameSync(artifact, dest)
-          fs.mkdirSync(path.dirname(artifact), { recursive: true })
-          fs.copyFileSync(dest, artifact)
-          result.artifacts[result.artifacts.indexOf(artifact)] = dest
-        }
-      }
     }
   },
 

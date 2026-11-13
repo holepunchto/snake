@@ -2,6 +2,7 @@
   "name": "snake",
   "productName": "Snake",
   "version": "1.0.0",
+  "upgrade": "pear://huezbke3irkuyi564cpz1ncfgk39eozwqxyihes5ymyy71i5589y",
   "description": "P2P multiplayer snake game",
   "license": "Apache-2.0",
   "author": "Holepunch Inc.",
@@ -13,13 +14,13 @@
     "format": "prettier --write . && lunte --fix",
     "start": "electron-forge start -- --no-updates",
     "package": "electron-forge package",
+    "build:release": "node scripts/build-release.js",
     "make": "electron-forge make",
     "make:darwin": "electron-forge make --platform=darwin",
     "make:win32": "electron-forge make --platform=win32",
     "make:linux": "electron-forge make --platform=linux",
     "make:linux:appimage": "electron-forge make --platform=linux --targets=pear-electron-forge-maker-appimage",
-    "start:darwin": "./out/Snake-darwin-arm64/Snake.app/Contents/MacOS/Snake",
-    "bootstrap": "node scripts/bootstrap.mjs"
+    "start:darwin": "./out/Snake-darwin-arm64/Snake.app/Contents/MacOS/Snake"
   },
   "dependencies": {
     "b4a": "^1.6.7",
@@ -36,8 +37,6 @@
     "@electron-forge/cli": "^7.11.1",
     "@electron-forge/maker-dmg": "^7.11.1",
     "@electron-forge/maker-msix": "^7.11.1",
-    "@electron-forge/maker-zip": "^7.11.1",
-    "app-builder-lib": "^26.8.1",
     "electron": "^40.2.1",
     "electron-forge-plugin-prune-prebuilds": "^1.0.0",
     "electron-forge-plugin-universal-prebuilds": "^1.0.0",
@@ -47,6 +46,5 @@
     "pear-electron-forge-maker-snap": "^0.0.10",
     "prettier": "^3.8.1",
     "prettier-config-holepunch": "^2.0.0"
-  },
-  "upgrade": ""
+  }
 }
