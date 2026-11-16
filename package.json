@@ -14,7 +14,6 @@
     "format": "prettier --write . && lunte --fix",
     "start": "electron-forge start -- --no-updates",
     "package": "electron-forge package",
-    "build:release": "node scripts/build-release.js",
     "make": "electron-forge make",
     "make:darwin": "electron-forge make --platform=darwin",
     "make:win32": "electron-forge make --platform=win32",

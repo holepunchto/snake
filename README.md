@@ -51,15 +51,15 @@ npm start -- --storage /tmp/second-instance
 
 Run **Build Snake Desktop** in [pear-snake-ci-build Actions](https://github.com/holepunchto/pear-snake-ci-build/actions). Select the source ref and platforms; enable `run-stage` to stage Pear updates, or `stage-dry-run` with it to preview staging. Update the version in `package.json` before building a new release.
 
-CI runs `npm run build:release` from this repository without release credentials. It signs the resulting artifacts on separate runners and handles Pear staging. Signing credentials belong only in the CI repository's protected `release` environment.
+CI uses the shared `make-pear-app` action to run this repository's package and make commands without release credentials. It signs the resulting artifacts on separate runners and handles Pear staging. Signing credentials belong only in the CI repository's protected `release` environment.
 
-To compile the current platform locally:
+To compile locally, run the matching command on each platform:
 
-```sh
-npm run build:release
-```
-
-The unsigned outputs are written to `out/desktop`.
+| Platform | Command                       | Unsigned output                     |
+| -------- | ----------------------------- | ----------------------------------- |
+| macOS    | `npm run package`             | `out/Snake-darwin-<arch>/Snake.app` |
+| Linux    | `npm run make:linux:appimage` | AppImage under `out/make`           |
+| Windows  | `npm run make:win32`          | MSIX under `out/make`               |
 
 ### Provisioning and multisig
 
