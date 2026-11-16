@@ -90,13 +90,6 @@ module.exports = {
   ],
 
   hooks: {
-    readPackageJson: async (forgeConfig, packageJson) => {
-      if (process.env.UPGRADE_KEY) {
-        packageJson.upgrade = process.env.UPGRADE_KEY
-      }
-
-      return packageJson
-    },
     preMake: async () => {
       fs.rmSync(path.join(__dirname, 'out', 'make'), { recursive: true, force: true })
 
