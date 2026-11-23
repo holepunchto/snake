@@ -1,8 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const os = require('os')
 const path = require('path')
-const PearRuntime = require('pear-runtime')
-const FramedStream = require('framed-stream')
+const SnakeCore = require('snake-core')
 
 const { isMac, isLinux, isWindows } = require('which-runtime')
 const { command, flag } = require('paparam')
@@ -69,15 +68,15 @@ function getWorker(specifier) {
 
   const extension = isLinux ? '.AppImage' : isMac ? '.app' : '.msix'
 
-  const worker = PearRuntime.run(require.resolve('..' + specifier), [
-    String(updates),
+  const pipe = new SnakeCore({
+    updates,
     version,
     upgrade,
-    productName + extension,
+    name: productName + extension,
     dir,
-    ...(appPath === null ? [] : [appPath])
-  ])
-  const pipe = new FramedStream(worker)
+    app: appPath
+  })
+  const worker = pipe.worker
 
   function sendWorkerStdout(data) {
     sendToAll('pear:worker:stdout:' + specifier, data)
